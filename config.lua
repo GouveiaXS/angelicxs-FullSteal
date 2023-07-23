@@ -1,3 +1,12 @@
+----------------------------------------------------------------------
+-- Thanks for supporting AngelicXS Scripts!							--
+-- Support can be found at: https://discord.gg/tQYmqm4xNb			--
+-- More paid scripts at: https://angelicxs.tebex.io/ 				--
+-- More FREE scripts at: https://github.com/GouveiaXS/ 				--
+----------------------------------------------------------------------
+-- Model info: https://docs.fivem.net/docs/game-references/ped-models/
+-- Blip info: https://docs.fivem.net/docs/game-references/blips/
+
 Config = {}
 
 
