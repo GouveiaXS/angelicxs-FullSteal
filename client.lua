@@ -11,6 +11,8 @@ local DropLocationNPC = false
 local MissionRoute = nil
 local Tracker = false
 local PlayerOwned = false
+local amount = 0
+local onMission = false
 
 RegisterNetEvent('angelicxs-FullSteal:Notify', function(message, type)
 	if Config.UseCustomNotify then
@@ -140,7 +142,7 @@ RegisterNetEvent('angelicxs-FullSteal:Start',function(nature)
     TriggerServerEvent('angelicxs-FullSteal:Server:NotifyPolice',1,data)
     TriggerEvent('angelicxs-FullSteal:CustomDisptachFoundIt',Pos)
     TriggerEvent('angelicxs-FullSteal:FailConditions')
-    Hotwire()
+    Hotwire(data)
 end)
 
 function Hotwire()
@@ -152,40 +154,61 @@ function Hotwire()
         Wait(10)
     end
     TaskPlayAnim(Player,"anim@amb@clubhouse@tutorial@bkr_tut_ig3@","machinic_loop_mechandplayer",1.0, -1.0, -1, 49, 0, 0, 0, 0)
+    RemoveAnimDict("anim@amb@clubhouse@tutorial@bkr_tut_ig3@")
+    gamePlay()
+end
 
+function gamePlay()
+    if onMission then return end
     ------------------------
     ------ GAME HERE -------
     ------------------------
-    local gamepass = false
-    exports['ps-ui']:Scrambler(function(success)
+    local time = 30
+    local nextgame = false
+    local notation = exports['ps-ui']:Scrambler(function(success)
         if success then
-            exports['ps-ui']:Scrambler(function(success)
-                if success then
-                    exports['ps-ui']:Scrambler(function(success)
-                        if success then
-                            exports['ps-ui']:Scrambler(function(success)
-                                if success then
-                                    gamepass = true
-                                end
-                            end, "greek", 30, 2)
-                        end
-                    end, "greek", 30, 0)
-                end
-            end, "alphanumeric", 30, 2)
+            amount = amount + 1
+            nextgame = true
+            if amount == Config.GameWins then
+                nextgame = false
+                amount = 0
+                minigameWin()
+            else
+                TriggerEvent('angelicxs-FullSteal:Notify', Config.Lang['nextgame']..' '..time..' '..Config.Lang['seconds'], Config.LangType['info'])
+            end
+        else
+            amount = 0
+            minigameLose()
         end
-    end, "alphanumeric", 30, 0) -- Type (alphabet, numeric, alphanumeric, greek, braille, runes), Time (Seconds), Mirrored (0: Normal, 1: Normal + Mirrored 2: Mirrored only )
+    end, "alphanumeric", time, 0) -- Type (alphabet, numeric, alphanumeric, greek, braille, runes), Time (Seconds), Mirrored (0: Normal, 1: Normal + Mirrored 2: Mirrored only )
+    while not notation do
+        Wait(1000)
+        time = time-1
+        if time <=0 then break end
+    end
+    if nextgame then
+        gamePlay()
+    end
     ------------------------
     ------ GAME HERE -------
     ------------------------
+end
+
+function minigameWin()
+    onMission = true
+    local Player = PlayerPedId()
     ClearPedTasks(Player)
     FreezeEntityPosition(Player, false)
-    RemoveAnimDict("anim@amb@clubhouse@tutorial@bkr_tut_ig3@")
-    if not gamepass then
-        TriggerEvent('angelicxs-FullSteal:Notify', Config.Lang['failgame'], Config.LangType['error'])
-        return
-    end
     local EndPoint = DropOff()
-    TriggerEvent('angelicxs-FullSteal:GPSRoute',EndPoint, data.vehicle)
+    TriggerEvent('angelicxs-FullSteal:GPSRoute',EndPoint, MissionVehicle)
+end
+
+function minigameLose()
+    local Player = PlayerPedId()
+    MissionVehicle = nil
+    ClearPedTasks(Player)
+    FreezeEntityPosition(Player, false)
+    TriggerEvent('angelicxs-FullSteal:Notify', Config.Lang['failgame'], Config.LangType['error'])
 end
 
 RegisterNetEvent('angelicxs-FullSteal:NotifyOwner')
@@ -212,12 +235,12 @@ AddEventHandler('angelicxs-FullSteal:NotifyPolice',function(Message, Data)
     if not Config.PoliceDispatch then
         if isLawEnforcement then
             if Message == 1 then
-                local street, cross = GetStreetNameAtCoord(data.coords.x, data.coords.y, data.coords.z)
+                local street, cross = GetStreetNameAtCoord(Data.coords.x, Data.coords.y, Data.coords.z)
                 local name = GetStreetNameFromHashKey(street)
                 local name2 = nil
                 if cross then name2 = GetStreetNameFromHashKey(cross) end
                 if name2 then name = tostring(Config.Lang['cornerof']..name..Config.Lang['and']..name2) end
-                TriggerEvent('angelicxs-FullSteal:Notify', Config.Lang['failgame']..tostring(data.plate)..Config.Lang['startlocation']..name..' '..Config.Lang['highprio'], Config.LangType['info'])
+                TriggerEvent('angelicxs-FullSteal:Notify', Config.Lang['failgame']..tostring(Data.plate)..Config.Lang['startlocation']..name..' '..Config.Lang['highprio'], Config.LangType['info'])
             end
         end
     end
@@ -345,6 +368,7 @@ RegisterNetEvent('angelicxs-FullSteal:FailConditions', function()
                             TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['failed_vehicleswap'], Config.LangType['error'])
                             TriggerEvent('angelicxs-FullSteal:ResetHeist')
                             forcefail = true
+                            onMission = false
                             break
                         end
                     end
@@ -365,6 +389,7 @@ RegisterNetEvent('angelicxs-FullSteal:FailConditions', function()
                             TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['failed_damage'], Config.LangType['error'])
                             TriggerEvent('angelicxs-FullSteal:ResetHeist')
                             forcefail = true
+                            onMission = false
                             break
                         end
                     end
@@ -382,6 +407,7 @@ RegisterNetEvent('angelicxs-FullSteal:FailConditions', function()
                 if TimeLimit <= 0 then
                     TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['failed_timeup'], Config.LangType['error'])
                     TriggerEvent('angelicxs-FullSteal:ResetHeist')
+                    onMission = false
                     forcefail = true
                     break
                 elseif forcefail then
@@ -418,6 +444,7 @@ RegisterNetEvent('angelicxs-FullSteal:Completion',function(coords)
     local Vehicle = GetVehiclePedIsIn(Player, true)
     local Dist = #(GetEntityCoords(Vehicle) - vector3(coords.x, coords.y, coords.z))
     if Dist <= 15 and DoesEntityExist(MissionVehicle) then
+        onMission = false
         RemoveBlip(MissionRoute)
         DeleteVehicle(MissionVehicle)
         TriggerServerEvent('angelicxs-FullSteal:Server:Completion')
@@ -452,6 +479,7 @@ RegisterNetEvent('angelicxs-FullSteal:KeepScratch',function(coords)
         end
         RemoveBlip(MissionRoute)
         DeleteVehicle(MissionVehicle)
+        onMission = false
         TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['garage'], Config.LangType['success'])
         TriggerEvent('angelicxs-FullSteal:ResetHeist')
         if Config.UseThirdEye then
@@ -475,6 +503,7 @@ AddEventHandler('angelicxs-FullSteal:ResetHeist', function(mv)
     end
     DropLocationNPC = false
     Tracker = false
+    onMission = false
 end)
 
 RegisterNetEvent('angelicxs-FullSteal:CheckVIN',function()
