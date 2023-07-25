@@ -23,16 +23,17 @@ end)
 
 -- Visual Preference
 Config.Use3DText = true 					-- Use 3D text for NPC interactions; only turn to false if Config.UseThirdEye is turned on and IS working.
-Config.UseThirdEye = false 					-- Enables using a third eye (third eye requires the following arguments debugPoly, useZ, options {event, icon, label}, distance)
+Config.UseThirdEye = true 					-- Enables using a third eye (third eye requires the following arguments debugPoly, useZ, options {event, icon, label}, distance)
 Config.ThirdEyeName = 'qb-target' 			-- Name of third eye aplication
 
 -- Item Requirement
-Config.HotWireName = 'vinscratcher'			-- Name of the stealing device
+Config.HotWireName = 'moneybag'			-- Name of the stealing device
 Config.RemoveHotWire = true					-- If true will remove Config.HotWireName upon use
-Config.RemoveChance = 50					-- 0-100% Chance to remove the item on use
+Config.RemoveChance = 0					-- 0-100% Chance to remove the item on use
+Config.GameWins = 4						-- Amount of times required to sucessfully beat the hack
 
 --LEO Configuration
-Config.RequireMinimumLEO = true 			-- When on will require a minimum number of LEOs to be available to start robbery
+Config.RequireMinimumLEO = false 			-- When on will require a minimum number of LEOs to be available to start robbery
 Config.RequiredNumberLEO = 2 				-- Minimum number of LEO needed for robbery to start when Config.RequireMinimumLEO = true
 Config.LEOJobName = {'police','bcso'} 		-- Job name of law enforcement officers (NOW TYPE)
 Config.PoliceDispatch = false 				-- If true, will turn off police messaging through notifications and ONLY use custom dispatch system (must fill event out below).
@@ -137,5 +138,7 @@ Config.Lang = {
 	['far_vin'] = 'Not close enough to check VIN!',
 	['failgame'] = 'You failed the hack!',
 	['beginstolen'] = 'You vehicle with the following license plate is currently being stolen! License Plate: ',
+	['seconds'] = 'seconds!',
+	['nextgame'] = 'Next hack in',
 
 }
