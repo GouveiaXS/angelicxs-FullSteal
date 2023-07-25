@@ -230,7 +230,7 @@ if Config.UseESX then
 		local xPlayer = ESX.GetPlayerFromId(source)
         if Config.RemoveHotWire then
             local chance = math.random(0,100)
-            if chance >= Config.RemoveChance then
+            if chance <= Config.RemoveChance then
 		        xPlayer.removeInventoryItem(Config.HotWireName, 1)
                 TriggerClientEvent('angelicxs-FullSteal:Notify',source, Config.Lang['itembreak'], Config.LangType['info'])
                 return
@@ -253,7 +253,7 @@ elseif Config.UseQBCore then
         local Player = QBCore.Functions.GetPlayer(source)
         if Config.RemoveHotWire then
             local chance = math.random(0,100)
-            if chance >= Config.RemoveChance then
+            if chance <= Config.RemoveChance then
                 Player.Functions.RemoveItem(Config.HotWireName, 1,item.slot)
                 TriggerClientEvent('angelicxs-FullSteal:Notify',source, Config.Lang['itembreak'], Config.LangType['info'])
                 return
