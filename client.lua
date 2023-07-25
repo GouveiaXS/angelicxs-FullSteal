@@ -112,7 +112,7 @@ function OwnedVehicleCheck()
     if Config.UseESX then
         VehicleStealing = ESX.Game.GetClosestVehicle()
         local VehicleData = ESX.Game.GetVehicleProperties(VehicleStealing)
-        Plate = 
+        Plate = VehicleData.plate
         ESX.TriggerServerCallback('angelicxs-FullSteal:OwnedVehicle:ESX', function(cb)
             OwnedVehicle = cb
         end, Plate) 
