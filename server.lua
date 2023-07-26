@@ -9,20 +9,30 @@ end
 
 if Config.UseESX then
     ESX.RegisterServerCallback('angelicxs-FullSteal:OwnedVehicle:ESX',function(source, cb, plate)
-        MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE plate = @plate', {
+        MySQL.Async.fetchAll('SELECT owner FROM owned_vehicles WHERE plate = @plate', {
             ['@plate'] = plate,
             }, function (result)
-                TriggerClientEvent('angelicxs-FullSteal:NotifyOwner',-1,result.owner, plate)
-                cb(result)
+                if result[1] then
+                    local car = result[1]
+                    TriggerClientEvent('angelicxs-FullSteal:NotifyOwner',-1,car.owner, plate)
+                    cb(car.owner)
+                else
+                    cb(false)
+                end
         end)
     end)
 elseif Config.UseQBCore then
     QBCore.Functions.CreateCallback('angelicxs-FullSteal:OwnedVehicle:QBCore', function(source, cb, plate)
-        MySQL.Async.fetchAll('SELECT * FROM player_vehicles WHERE plate = @plate', {
+        MySQL.Async.fetchAll('SELECT citizenid FROM player_vehicles WHERE plate = @plate', {
             ['@plate'] = plate,
             }, function (result)
-                TriggerClientEvent('angelicxs-FullSteal:NotifyOwner',-1,result.citizenid, plate)
-                cb(result)
+                if result[1] then
+                    local car = result[1]
+                    TriggerClientEvent('angelicxs-FullSteal:NotifyOwner',-1,car.citizenid, plate)
+                    cb(car.citizenid)
+                else
+                    cb(false)
+                end
         end)
     end)
 end
@@ -113,22 +123,22 @@ AddEventHandler('angelicxs-FullSteal:Server:KeepPlayerScratch', function(Vehicle
         local xPlayer = ESX.GetPlayerFromId(src)
         MySQL.Async.execute('UPDATE owned_vehicles SET owner = @owner WHERE plate = @plate', {
             ['@owner']   = xPlayer.identifier,
-            ['@plate']   = plate,
+            ['@plate']   = VehiclePlate,
             }, function(rowsChanged)
             if Config.VINCheck then
                 MySQL.Async.execute('UPDATE owned_vehicles SET scratched = 1 WHERE plate @plate',
-                {['@plate'] = plate, }, function (rowsChanged) end)
+                {['@plate'] = VehiclePlate, }, function (rowsChanged) end)
             end
         end)
     elseif Config.UseQBCore then
         local pData = QBCore.Functions.GetPlayer(src)
         MySQL.Async.execute('UPDATE player_vehicles SET citizenid = @citizenid WHERE plate = @plate', {
             ['@citizenid'] = pData.PlayerData.citizenid,
-            ['@plate'] = plate,
+            ['@plate'] = VehiclePlate,
             }, function (rowsChanged)
             if Config.VINCheck then
                 MySQL.Async.execute('UPDATE player_vehicles SET scratched = 1 WHERE plate @plate',
-                {['@plate'] = plate, }, function (rowsChanged) end)
+                {['@plate'] = VehiclePlate, }, function (rowsChanged) end)
             end
         end)
     end
@@ -138,7 +148,7 @@ RegisterServerEvent('angelicxs-FullSteal:Server:KeepScratch')
 AddEventHandler('angelicxs-FullSteal:Server:KeepScratch', function(VehiclePlate, PlayerOwned)
     if PlayerOwned then
         local src = source
-        TriggerEvent('angelicxs-FullSteal:Server:KeepPlayerScratch', VehiclePlate, src)
+        TriggerEvent('angelicxs-FullSteal:Server:KeepPlayerScratch', VehiclePlate.plate, src)
         return
     end
     if Config.VINCheck then
@@ -152,16 +162,20 @@ AddEventHandler('angelicxs-FullSteal:Server:KeepScratch', function(VehiclePlate,
                 }, function(rowsChanged)
             end)
         elseif Config.UseQBCore then
-            local vehicle = VehiclePlate
+            local model = nil
+            for _, v in pairs(QBCore.Shared.Vehicles) do
+                if VehiclePlate.model == v.hash then
+                    model = v.model
+                end
+            end
             local pData = QBCore.Functions.GetPlayer(source)
-            local cid = pData.PlayerData.citizenid
             local plate = PlateQBGen()
             MySQL.Async.execute('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, state, garage, scratched) VALUES (@license, @citizenid, @vehicle, @hash, @mods, @plate, @state, @garage, @scratched)', {
                 ['@license'] = pData.PlayerData.license,
-                ['@citizenid'] = cid,
-                ['@vehicle'] = VehiclePlate.model,
-                ['@hash'] = GetHashKey(VehiclePlate.model),
-                ['@mods'] = '{}',
+                ['@citizenid'] = pData.PlayerData.citizenid,
+                ['@vehicle'] = model,
+                ['@hash'] = VehiclePlate.model,
+                ['@mods'] = json.encode(VehiclePlate),
                 ['@plate'] = plate,
                 ['@state'] = 1,
                 ['@garage'] = "pillboxgarage",
@@ -179,16 +193,20 @@ AddEventHandler('angelicxs-FullSteal:Server:KeepScratch', function(VehiclePlate,
                 }, function(rowsChanged)
             end)
         elseif Config.UseQBCore then
-            local vehicle = VehiclePlate
+            local model = nil
+            for _, v in pairs(QBCore.Shared.Vehicles) do
+                if VehiclePlate.model == v.hash then
+                    model = v.model
+                end
+            end
             local pData = QBCore.Functions.GetPlayer(source)
-            local cid = pData.PlayerData.citizenid
             local plate = PlateQBGen()
             MySQL.Async.execute('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, state, garage) VALUES (@license, @citizenid, @vehicle, @hash, @mods, @plate, @state, @garage)', {
                 ['@license'] = pData.PlayerData.license,
-                ['@citizenid'] = cid,
-                ['@vehicle'] = VehiclePlate.model,
-                ['@hash'] = GetHashKey(VehiclePlate.model),
-                ['@mods'] = '{}',
+                ['@citizenid'] = pData.PlayerData.citizenid,
+                ['@vehicle'] = model,
+                ['@hash'] = VehiclePlate.model,
+                ['@mods'] = json.encode(VehiclePlate),
                 ['@plate'] = plate,
                 ['@state'] = 1,
                 ['@garage'] = "pillboxgarage"
