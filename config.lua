@@ -27,7 +27,7 @@ Config.UseThirdEye = true 					-- Enables using a third eye (third eye requires 
 Config.ThirdEyeName = 'qb-target' 			-- Name of third eye aplication
 
 -- Item Requirement
-Config.HotWireName = 'moneybag'			-- Name of the stealing device
+Config.HotWireName = 'vin_scratcher'			-- Name of the stealing device
 Config.RemoveHotWire = true					-- If true will remove Config.HotWireName upon use
 Config.RemoveChance = 0					-- 0-100% Chance to remove the item on use
 Config.GameWins = 4						-- Amount of times required to sucessfully beat the hack
@@ -75,7 +75,7 @@ Config.TimetoRoute = 0 						-- How long in minutes, until the drop off point is
 
 -- Rewards Configuration
 Config.AllowKeepingVehicle = true 			-- When true will allow individuals to keep the vehicle instead of gaining rep and other rewards.
-Config.AllowKeepingPlayerVehicle = false	-- If true will allow players to STEAL vehicles from each other
+Config.AllowKeepingPlayerVehicle = false	-- If true will allow players to STEAL vehicles from each other, requires Config.AllowKeepingVehicle = true
 Config.AccountMoney = 'cash' 				-- How you want the delivery paid.
 Config.MoneyAmount = 5000 					-- If Config.RandomMoneyAmount = false, Amount paid out in Config.AccountMoney for a successful delivery.
 Config.RandomMoneyAmount = true 			--If true, will randomly award money ammount on successful completion instead of Config.MoneyAmount.
