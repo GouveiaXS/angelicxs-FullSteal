@@ -463,13 +463,14 @@ end)
 
 RegisterNetEvent('angelicxs-FullSteal:KeepScratch',function(coords)
     local Player = PlayerPedId()
-    local Vehicle = GetVehiclePedIsIn(Player, true)
-    local Dist = #(GetEntityCoords(Vehicle) - vector3(coords.x, coords.y, coords.z))
+    local Vehicle = GetEntityCoords(MissionVehicle)
+    local Dist = #(GetEntityCoords(Player) - vector3(coords.x, coords.y, coords.z))
+    local Dist2 = #(Vehicle - vector3(coords.x, coords.y, coords.z))
     if not Config.AllowKeepingPlayerVehicle and PlayerOwned or not Config.AllowKeepingVehicle then
         TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['no_scratch'], Config.LangType['error'])
         return
     end
-    if Dist <= 15 and DoesEntityExist(MissionVehicle) then
+    if Dist <= 15 and Dist2 <= 15 and DoesEntityExist(MissionVehicle) then
         if Config.UseESX then
             local VehiclePlate = ESX.Game.GetVehicleProperties(MissionVehicle)
             TriggerServerEvent('angelicxs-FullSteal:Server:KeepScratch', VehiclePlate, PlayerOwned)
