@@ -71,7 +71,6 @@ AddEventHandler('angelicxs-FullSteal:CustomDisptachFoundIt', function(coordz)
 end)
 
 --Inital Difficulty Configuration
-Config.TimetoFind = 20 						-- How long in minutes, does the robber have to find the vehicle, before the mission fails. 
 Config.TimetoRoute = 0 						-- How long in minutes, until the drop off point is shown.
 
 -- Rewards Configuration
