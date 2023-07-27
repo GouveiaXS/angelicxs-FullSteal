@@ -92,7 +92,7 @@ AddEventHandler('angelicxs-FullSteal:Server:CheckVIN', function(plate)
             }, function (result)
             local owner = table.unpack(result)
             if owner ~= nil then 
-                if owner.scratched == 1 then
+                if owner.scratched then
                     stolen = 1
                 end
             else 
@@ -105,7 +105,7 @@ AddEventHandler('angelicxs-FullSteal:Server:CheckVIN', function(plate)
             }, function (result)
             local owner = table.unpack(result)
             if owner ~= nil then 
-                if owner.scratched == 1 then
+                if owner.scratched then
                     stolen = 1
                 end
             else 
@@ -113,6 +113,7 @@ AddEventHandler('angelicxs-FullSteal:Server:CheckVIN', function(plate)
             end
         end)
     end 
+    Wait(1000)
     TriggerClientEvent('angelicxs-FullSteal:CheckVINConfirmation', src, stolen)
 end)
 
