@@ -127,7 +127,7 @@ AddEventHandler('angelicxs-FullSteal:Server:KeepPlayerScratch', function(Vehicle
             ['@plate']   = VehiclePlate,
             }, function(rowsChanged)
             if Config.VINCheck then
-                MySQL.Async.execute('UPDATE owned_vehicles SET scratched = 1 WHERE plate @plate',
+                MySQL.Async.execute('UPDATE owned_vehicles SET scratched = 1 WHERE plate = @plate',
                 {['@plate'] = VehiclePlate, }, function (rowsChanged) end)
             end
         end)
