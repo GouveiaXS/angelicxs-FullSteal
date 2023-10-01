@@ -140,7 +140,7 @@ RegisterNetEvent('angelicxs-FullSteal:Start',function(nature)
     data.plate = nature
     data.coords = GetEntityCoords(PlayerPedId())
     TriggerServerEvent('angelicxs-FullSteal:Server:NotifyPolice',1,data)
-    TriggerEvent('angelicxs-FullSteal:CustomDisptachFoundIt',Pos)
+    TriggerEvent('angelicxs-FullSteal:CustomDisptachFoundIt',data.coords)
     TriggerEvent('angelicxs-FullSteal:FailConditions')
     Hotwire(data)
 end)
