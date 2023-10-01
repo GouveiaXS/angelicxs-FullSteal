@@ -163,7 +163,7 @@ function gamePlay()
     ------------------------
     ------ GAME HERE -------
     ------------------------
-    local time = 30
+    local time = 32
     local nextgame = false
     local notation = exports['ps-ui']:Scrambler(function(success)
         if success then
@@ -180,7 +180,7 @@ function gamePlay()
             amount = 0
             minigameLose()
         end
-    end, "alphanumeric", time, 0) -- Type (alphabet, numeric, alphanumeric, greek, braille, runes), Time (Seconds), Mirrored (0: Normal, 1: Normal + Mirrored 2: Mirrored only )
+    end, "alphanumeric", time-2, 0) -- Type (alphabet, numeric, alphanumeric, greek, braille, runes), Time (Seconds), Mirrored (0: Normal, 1: Normal + Mirrored 2: Mirrored only )
     while not notation do
         Wait(1000)
         time = time-1
