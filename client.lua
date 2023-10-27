@@ -267,37 +267,60 @@ RegisterNetEvent('angelicxs-FullSteal:GPSRoute',function(coords, MV)
                 SetModelAsNoLongerNeeded(hash)
                 DropPed = true
                 if Config.UseThirdEye then
-                    exports[Config.ThirdEyeName]:AddEntityZone('DROPNPC', DropNPC, {
-                        name="DROPNPC",
-                        debugPoly=false,
-                        useZ = true
-                        }, {
-                        options = {
+                    if Config.ThirdEyeName == 'ox_target' then
+                        local oxoptions = {
                             {
                             icon = 'fas fa-clipboard-list',
                             label = Config.Lang['dropvehicle'], 
-                            action = function()
+                            onSelect = function()
                                 TriggerEvent('angelicxs-FullSteal:Completion',coords)
                             end,
                             },
                             {
                             icon = 'fas fa-clipboard-list',
                             label = Config.Lang['keepvehicle'], 
-                            action = function()
+                            onSelect = function()
                                 TriggerEvent('angelicxs-FullSteal:KeepScratch',coords)
                             end,
                             },
                             
-                        },
-                        distance = 2
-                    })        
+                        }
+                        exports.ox_target:addLocalEntity(DropNPC, oxoptions)
+                    else
+                        exports[Config.ThirdEyeName]:AddEntityZone('DROPNPC', DropNPC, {
+                            name="DROPNPC",
+                            debugPoly=false,
+                            useZ = true
+                            }, {
+                            options = {
+                                {
+                                icon = 'fas fa-clipboard-list',
+                                label = Config.Lang['dropvehicle'], 
+                                action = function()
+                                    TriggerEvent('angelicxs-FullSteal:Completion',coords)
+                                end,
+                                },
+                                {
+                                icon = 'fas fa-clipboard-list',
+                                label = Config.Lang['keepvehicle'], 
+                                action = function()
+                                    TriggerEvent('angelicxs-FullSteal:KeepScratch',coords)
+                                end,
+                                },
+                                
+                            },
+                            distance = 2
+                        })     
+                    end   
                 end
             elseif DoesEntityExist(DropNPC) and DropPed then
                 if Dist > 100 then
                     DeleteEntity(DropNPC)
                     DropPed = false
                     if Config.UseThirdEye then
-                        exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+                        if Config.ThirdEyeName ~= 'ox_target' then
+                            exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+                        end
                     end
                 end
             end
@@ -451,7 +474,9 @@ RegisterNetEvent('angelicxs-FullSteal:Completion',function(coords)
         TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['reward'], Config.LangType['success'])
         TriggerEvent('angelicxs-FullSteal:ResetHeist')
         if Config.UseThirdEye then
-            exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+            if Config.ThirdEyeName ~= 'ox_target' then
+                exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+            end
         end
         SetEntityAsNoLongerNeeded(DropNPC)
     elseif Dist <= 15 and not DoesEntityExist(MissionVehicle) then
@@ -484,7 +509,9 @@ RegisterNetEvent('angelicxs-FullSteal:KeepScratch',function(coords)
         TriggerEvent('angelicxs-FullSteal:Notify',Config.Lang['garage'], Config.LangType['success'])
         TriggerEvent('angelicxs-FullSteal:ResetHeist')
         if Config.UseThirdEye then
-            exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+            if Config.ThirdEyeName ~= 'ox_target' then
+                exports[Config.ThirdEyeName]:RemoveZone('DROPNPC')
+            end
         end
         SetEntityAsNoLongerNeeded(DropNPC)
     else
@@ -550,17 +577,22 @@ CreateThread(function()
             end)
         end
         if Config.UseThirdEye then
-            exports[Config.ThirdEyeName]:AddGlobalVehicle({
-                options = {
-                    {
-                        event = "angelicxs-FullSteal:CheckVIN",
-                        icon = "fa-solid fa-arrows-to-eye",
-                        label = "Check VIN Status",
-                        job = Config.LEOJobName,
-                    },
+            local globeoptions = {
+                {
+                    event = "angelicxs-FullSteal:CheckVIN",
+                    icon = "fa-solid fa-arrows-to-eye",
+                    label = Config.Lang['vin_good'],
+                    canInteract = function() return isLawEnforcement end,
                 },
-                distance = 2,
-            })
+            }
+            if Config.ThirdEyeName == 'ox_target' then
+                exports.ox_target:addGlobalVehicle(globeoptions)
+            else
+                exports[Config.ThirdEyeName]:AddGlobalVehicle({
+                    options = globeoptions,
+                    distance = 2,
+                })
+            end
         end
     end
 end)
