@@ -139,5 +139,6 @@ Config.Lang = {
 	['beginstolen'] = 'You vehicle with the following license plate is currently being stolen! License Plate: ',
 	['seconds'] = 'seconds!',
 	['nextgame'] = 'Next hack in',
+	['eyevincheck'] = 'Check VIN Status',
 
 }
