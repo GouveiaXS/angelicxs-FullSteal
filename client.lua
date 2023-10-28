@@ -433,7 +433,7 @@ RegisterNetEvent('angelicxs-FullSteal:FailConditions', function()
                     onMission = false
                     forcefail = true
                     break
-                elseif forcefail then
+                elseif forcefail or not DoesEntityExist(MissionVehicle) then
                     break
                 end
             end
